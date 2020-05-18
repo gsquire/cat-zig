@@ -19,22 +19,21 @@ pub fn main() void {
     var args = std.process.args();
 
     // Advance the iterator since we want to ignore the binary name.
-    var bin_name = args.nextPosix();
+    _ = args.nextPosix();
 
-    var fname = args.nextPosix();
-    if (fname == null) {
+    var fname = args.nextPosix() orelse {
         std.debug.warn("expected at least one file name as an argument\n", .{});
         std.os.exit(1);
-    }
+    };
 
-    if (readFile(fname.?)) |_| {} else |err| {
+    readFile(fname) catch |err| {
         std.debug.warn("error reading file: {}\n", .{err});
-    }
+    };
 
     // We may have been passed more than one file so try and read them here.
     while (args.nextPosix()) |a| {
-        if (readFile(a)) |_| {} else |err| {
+        readFile(a) catch |err| {
             std.debug.warn("error reading file: {}\n", .{err});
-        }
+        };
     }
 }
